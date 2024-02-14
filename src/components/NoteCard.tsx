@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface NoteCardProps {
   note: {
@@ -13,11 +14,30 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, onNoteDeleted }: NoteCardProps) {
+  const [formattedDistance, setFormattedDistance] = useState<string>('')
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const timerID = setTimeout(() => {
+      setCurrentTime(new Date())
+    }, 60000)
+
+    const distance = formatDistanceToNow(note.date, {
+      locale: ptBR,
+      addSuffix: true
+    })
+
+    if (distance !== formattedDistance) {
+      setFormattedDistance(distance)
+    }
+    return () => clearTimeout(timerID)
+  }, [currentTime])
+
   return (
     <Dialog.Root>
       <Dialog.Trigger className="rounded-md flex flex-col text-left bg-slate-800 p-5 gap-3 overflow-hidden relative hover:ring-2 hover:ring-slate-600 outline-none focus-visible:ring-2 focus-visible:ring-lime-400">
         <span className="text-sm font-medium text-slate-300">
-          {formatDistanceToNow(note.date, { locale: ptBR, addSuffix: true })}
+          {formattedDistance}
         </span>
         <p className="text-sm leading-6 text-slate-400">{note.content}</p>
 
@@ -31,10 +51,7 @@ export function NoteCard({ note, onNoteDeleted }: NoteCardProps) {
           </Dialog.Close>
           <div className="flex flex-1 flex-col gap-3 p-5">
             <span className="text-sm font-medium text-slate-300">
-              {formatDistanceToNow(note.date, {
-                locale: ptBR,
-                addSuffix: true
-              })}
+              {formattedDistance}
             </span>
             <p className="text-sm leading-6 text-slate-400">{note.content}</p>
           </div>
