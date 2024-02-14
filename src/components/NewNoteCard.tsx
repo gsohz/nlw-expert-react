@@ -26,10 +26,32 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
     }
   }
 
-  function handleSaveNote(event: FormEvent) {
-    event.preventDefault()
+  function handleEnter(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      if (content === '') {
+        toast.error('Não é possível criar nota vazia')
+      }
+
+      handleSaveNote()
+    }
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Backspace' && content === '') {
+      event.preventDefault()
+      toast.error('Não é possível excluir mais. O campo está vazio.')
+      return
+    }
+
+    setShouldShowOnboarding(false)
+  }
+
+  function handleSaveNote(event?: FormEvent) {
+    event?.preventDefault()
 
     if (content === '') {
+      toast.error('Não é possível criar nota vazia')
       return
     }
 
@@ -112,7 +134,10 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
 
       <Dialog.Portal>
         <Dialog.Overlay className="inset-0 fixed bg-black/60" />
-        <Dialog.Content className="fixed inset-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-[640px] w-full md:h-[60vh] bg-slate-700 md:rounded-md flex flex-col outline-none overflow-hidden">
+        <Dialog.Content
+          onKeyDownCapture={handleKeyDown}
+          className="fixed inset-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-[640px] w-full md:h-[60vh] bg-slate-700 md:rounded-md flex flex-col outline-none overflow-hidden"
+        >
           <Dialog.Close
             onClick={handleCloseDialog}
             className="absolute right-0 top-0 bg-slate-800 p-1.5 text-slate-400 hover:text-slate-100"
@@ -151,6 +176,7 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
                   autoFocus
                   className="text-sm leading-6 text-slate-400 bg-transparent resize-none flex-1 outline-none"
                   onChange={handleContentChanged}
+                  onKeyDown={handleEnter}
                   value={content}
                 />
               )}
