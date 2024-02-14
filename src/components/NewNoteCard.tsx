@@ -33,6 +33,10 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
         toast.error('Não é possível criar nota vazia')
       }
 
+      if (isRecording) {
+        handleStopRecording()
+      }
+
       handleSaveNote()
     }
   }
@@ -100,9 +104,9 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
   }
 
   function handleStopRecording(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) {
-    event.preventDefault()
+    event?.preventDefault()
     setIsRecording(false)
 
     if (speechRecognition !== null) {
